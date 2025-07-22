@@ -1,5 +1,20 @@
 from PIL import Image, ImageChops
 import numpy as np
+import requests
+from io import BytesIO
+from requests.auth import HTTPDigestAuth
+
+url = "http://192.168.1.108/cgi-bin/snapshot.cgi?channel=2&type=0"
+auth = HTTPDigestAuth('admin', 'admin123')
+
+response = requests.get(url, auth=auth)
+
+if response.status_code == 200:
+    img2 = Image.open(BytesIO(response.content))
+
+else:
+    print(f"Erro ao acessar DVR: {response.status_code}")
+
 
 def comparacao(im1, im2):
     im1 = im1.convert("RGB")
@@ -19,17 +34,13 @@ def comparacao(im1, im2):
 
     return media_diff
 
-# Teste
-
-img1 = Image.open(r"C:\Users\lu063249\Pictures\WhatsApp Image 2025-07-21 at 22.38.34 (2).jpeg")
-img2 = str(input('Foto: ')).strip().strip('"')
-img2 = Image.open(img2)
+img1 = Image.open(r"C:\Users\lu063249\PythonProject\TesteValidacao\Imagem_padrao.jpeg")
 
 media_diff = comparacao(img1, img2)
 
 print(f"As imagens têm {media_diff} de similaridade.")
 
-if media_diff < 20:  # ajuste o limite como quiser
+if media_diff < 45:
     print("APROVADO")
 else:
     print("REPROVADO")
