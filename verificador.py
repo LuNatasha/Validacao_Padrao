@@ -8,7 +8,7 @@ import time
 import tkinter as tk
 import logging
 import os
-
+from tkinter import ttk
 
 class SistemaValidacaoSSIM:
     def __init__(self):
@@ -97,7 +97,7 @@ class SistemaValidacaoSSIM:
         img_np = np.array(img_pil.convert('L'))  # Converte para tons de cinza
         media = img_np.mean()
         print(f"Canal {canal_id:02d} - Média de brilho: {media:.2f}")
-        return media < 16.50
+        return media < 18.50
 
     def verificar_automaticamente(self):
         while True:
@@ -174,7 +174,7 @@ class SistemaValidacaoSSIM:
 
         self.canais_processando[canal_escolhido] = True
         self.labels_resultado[canal_escolhido].config(text="PROCESSANDO...", fg="white", bg="orange")
-
+        
         self.janela.after(200000, lambda: self.mostrar_resultado(canal_escolhido))
 
     def mostrar_resultado(self, canal_escolhido):
@@ -250,6 +250,32 @@ class SistemaValidacaoSSIM:
 
         self.cabecalho(frame)
         self.canais(frame)
+
+        frame_modelo = tk.Frame(self.janela, bg=self.COR_FUNDO)
+        frame_modelo.place(x=10, y=100)  # 10 pixels da esquerda e 10 pixels do topo
+
+        tk.Label(frame_modelo, text="MODELO:", bg=self.COR_FUNDO, fg=self.COR_FONTE,
+                 font=("Segoe UI", 12, "bold")).pack(side=tk.LEFT, padx=5)
+
+        # Cria o Combobox
+        self.combobox_modelos = ttk.Combobox(frame_modelo, state="readonly")
+        self.combobox_modelos['values'] = ["4140031 - 4K", "4140032 - STICK", "4140033 - FULL HD",
+                                           "4140040 - DONGLE 4k"]
+        self.combobox_modelos.current(0)
+        self.combobox_modelos.pack(side=tk.LEFT, padx=5)
+
+        # Variável que armazenará o modelo selecionado
+        self.modelo_selecionado = self.combobox_modelos.get()
+
+        # Botão para atualizar o modelo selecionado
+        botao_atualizar = tk.Button(frame_modelo, text="ATUALIZAR", font=("Segoe UI", 11, "bold"),
+                                    bg=self.COR_BOTAO, fg="white", activebackground="#45a049",
+                                    command=self.atualizar_modelo)
+        botao_atualizar.pack(side=tk.LEFT, padx=5)
+
+    def atualizar_modelo(self):
+        self.modelo_selecionado = self.combobox_modelos.get()
+        messagebox.showinfo("Atualizado", f"Modelo selecionado: {self.modelo_selecionado}")
 
     def cabecalho(self, frame):
         headers = ["CANAL", "STATUS", "NS/MAC1/MAC2", "EXECUTAR"]
