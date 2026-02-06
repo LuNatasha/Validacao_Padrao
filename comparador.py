@@ -1,4 +1,5 @@
 from PIL import Image
+from math import log2
 import numpy as np
 import requests
 from io import BytesIO
@@ -75,3 +76,22 @@ def obter_info_imagem(img):
         'formato': img.format,
         'brilho_medio': np.array(img.convert('L')).mean()
     }
+
+def calcular_entropia(img):
+    if img is None:
+        return 0.0
+    gray = img.convert('L')  # Converte para escala de cinza
+    arr = np.array(gray)
+
+    # Calcula histograma e normaliza para obter probabilidades
+    hist, _ = np.histogram(arr, bins=256, range=(0, 256))
+    total_pixels = hist.sum()
+    if total_pixels == 0:
+        return 0.0
+
+    probs = hist / total_pixels
+
+    # Calcula entropia com a fórmula correta
+    entropia = -np.sum([p * log2(p) for p in probs if p > 0])
+
+    return entropia
