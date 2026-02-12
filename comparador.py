@@ -34,19 +34,19 @@ def canal(ip, x):
 def comparar_ssim(im1, im2):
 
     try:
-        # Converte para escala de cinza
+        
         im1 = im1.convert("L")
         im2 = im2.convert("L")
 
-        # Converte para arrays numpy
+        
         im1_array = np.array(im1)
         im2_array = np.array(im2)
 
-        # Ajusta o tamanho se necessário
+        
         if im1_array.shape != im2_array.shape:
             im2_array = cv2.resize(im2_array, (im1_array.shape[1], im1_array.shape[0]))
 
-        # Calcula SSIM
+        
         score, _ = ssim(im1_array, im2_array, full=True)
         return score
 
@@ -58,7 +58,7 @@ def comparar_ssim(im1, im2):
 def validar_conexao_dvr(ip):
 
     try:
-        # Testa conexão com o canal 1
+        
         teste_img = canal(ip, 1)
         return teste_img is not None
     except:
@@ -80,10 +80,10 @@ def obter_info_imagem(img):
 def calcular_entropia(img):
     if img is None:
         return 0.0
-    gray = img.convert('L')  # Converte para escala de cinza
+    gray = img.convert('L') 
     arr = np.array(gray)
 
-    # Calcula histograma e normaliza para obter probabilidades
+   
     hist, _ = np.histogram(arr, bins=256, range=(0, 256))
     total_pixels = hist.sum()
     if total_pixels == 0:
@@ -91,7 +91,7 @@ def calcular_entropia(img):
 
     probs = hist / total_pixels
 
-    # Calcula entropia com a fórmula correta
+    
     entropia = -np.sum([p * log2(p) for p in probs if p > 0])
 
     return entropia
