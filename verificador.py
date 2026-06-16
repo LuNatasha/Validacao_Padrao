@@ -18,17 +18,14 @@ class SistemaValidacaoSSIM:
     def __init__(self):
         self.after_ids = {}
         self.ip = "192.168.1.108"
-
-        # Criar diretório para logs se não existir
+        
         self.logs_dir = "logs_validacao"
         if not os.path.exists(self.logs_dir):
             os.makedirs(self.logs_dir)
-
-        # Lock para sincronização de criação de logs
+        
         self.lock_logger = Lock()
         self.contador_logs = 0
 
-        # Cores do tema
         self.COR_FUNDO = "#000000"
         self.COR_FONTE = "#ffffff"
         self.COR_LABEL = "#000000"
@@ -36,11 +33,11 @@ class SistemaValidacaoSSIM:
         self.COR_BOTAO = "#00B140"
         self.logo_image = None
 
-        # Cores de status
-        self.COR_STATUS_AGUARDANDO = "#FFC107"  # Amarelo
-        self.COR_STATUS_OK = "#4CAF50"  # Verde
-        self.COR_STATUS_NOK = "#F44336"  # Vermelho
-        self.COR_STATUS_SEMIMAGEM = "#0000FF"  # Azul
+  
+        self.COR_STATUS_AGUARDANDO = "#FFC107"  
+        self.COR_STATUS_OK = "#4CAF50"
+        self.COR_STATUS_NOK = "#F44336" 
+        self.COR_STATUS_SEMIMAGEM = "#0000FF"  
 
         self.labels_resultado = {}
         self.entradas_canais = {}
@@ -60,7 +57,7 @@ class SistemaValidacaoSSIM:
         self.setup_interface()
         self.varificacao()
 
-    # Logger individual por NS
+    
     def criar_logger_individual(self, ns, canal_id):
         """Versão otimizada com lock e identificador único"""
         with self.lock_logger:
@@ -113,7 +110,7 @@ class SistemaValidacaoSSIM:
             self.loggers_individuais[f"{ns}_{canal_id}"] = logger
             return logger
 
-    # Carrega logo da interface
+    
     def carregar_logo(self):
         try:
             img = Image.open(r"C:\Users\linha.izzy\Documents\TesteValidacao\fotos\logo.png")
@@ -124,14 +121,13 @@ class SistemaValidacaoSSIM:
             print(f"Erro ao carregar logo: {e}")
             return False
 
-    # Detecta se imagem está preta
+    
     def imagem_ta_preta(self, img_pil, canal_id):
         img_np = np.array(img_pil.convert('L'))
         media = img_np.mean()
         entropia = calcular_entropia(img_pil)
         return media < 18.50 and entropia < 1.02
 
-    # Análise de cada canal
     def analisar_canal(self, canal_id):
         img = canal(self.ip, canal_id)
         if img is None:
@@ -140,7 +136,7 @@ class SistemaValidacaoSSIM:
             return canal_id, "SEM IMAGEM"
         return canal_id, "AGUARDANDO"
 
-    # Verificação simultânea de todos os canais
+
     def verificar_automaticamente(self):
         while True:
             futures = {self.executor.submit(self.analisar_canal, canal_id): canal_id for canal_id in range(1, 11)}
@@ -208,7 +204,7 @@ class SistemaValidacaoSSIM:
         else:
             self.valores_processados[canal] = texto_atual
 
-    # Inicia processo de validação - SEM TEMPO DE ESPERA
+  
     def iniciar_processo(self, canal_escolhido, automatico=False):
         ns = self.entradas_canais[canal_escolhido].get().strip()
         if not ns:
@@ -227,7 +223,7 @@ class SistemaValidacaoSSIM:
 
         self.canais_processando[canal_escolhido] = True
 
-        # Verifica se o modelo está configurado
+      
         if self.modelo_selecionado not in self.imagens_referencia:
             messagebox.showerror("Erro", f"Modelo '{self.modelo_selecionado}' não configurado!")
             self.canais_processando[canal_escolhido] = False
@@ -235,10 +231,10 @@ class SistemaValidacaoSSIM:
             self.entradas_canais[canal_escolhido].config(state="normal")
             return
 
-        # MOSTRA O RESULTADO IMEDIATAMENTE
+       
         self.mostrar_resultado(canal_escolhido)
 
-    # Mostrar resultado INSTANTANEAMENTE
+    
     def mostrar_resultado(self, canal_escolhido):
         """Mostra resultado imediatamente após bipagem"""
         valor_entrada = self.entradas_canais[canal_escolhido].get()
@@ -255,7 +251,6 @@ class SistemaValidacaoSSIM:
             self.entradas_canais[canal_escolhido].config(state="normal")
             return
 
-        # Usa a imagem de referência do modelo selecionado
         caminho_imagem_ref = self.imagens_referencia.get(self.modelo_selecionado)
 
         if not caminho_imagem_ref or not os.path.exists(caminho_imagem_ref):
@@ -281,7 +276,7 @@ class SistemaValidacaoSSIM:
             cor_bg = self.COR_STATUS_NOK
             print(f"\n\nRESULTADO CH{canal_escolhido:02d} - {ssim_score:.4f}\n")
 
-        # Cria logger
+       
         try:
             logger = self.criar_logger_individual(ns, canal_escolhido)
             logger.info(f"Canal: CH{canal_escolhido:02d}")
@@ -305,7 +300,7 @@ class SistemaValidacaoSSIM:
         else:
             self.entradas_canais[canal_escolhido].config(state="normal")
 
-    # Interface gráfica
+ 
     def setup_interface(self):
         self.janela = tk.Tk()
         self.janela.title("TESTE DE VERIFICAÇÃO")
